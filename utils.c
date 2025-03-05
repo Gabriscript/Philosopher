@@ -22,10 +22,11 @@ static int ft_strlen(char *s)
     return (i);
 }
 
-static void ft_putstr_fd(char *s,int fd)
+ void ft_putstr_fd(char *s,int fd)
 {
-    if(s)
-        write(fd,s,ft_strlen(s));
+    if(!s)
+        return ;
+    write(fd,s,ft_strlen(s));
 }
 
 int	ft_atoi(char *str)
@@ -75,3 +76,36 @@ void *safe_malloc(size_t bytes)
     return (ret);
 }
 
+size_t	get_current_time(void)
+{
+	struct timeval	time;
+
+	if (gettimeofday(&time, NULL) == -1)
+		ft_putstr_fd( "gettimeofday() error\n", 2);
+	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+}
+
+int	ft_usleep(size_t milliseconds)
+{
+	size_t	start;
+
+	start = get_current_time();
+	while ((get_current_time() - start) < milliseconds)
+		usleep(500);
+	return (0);
+}
+
+
+
+void cleanup_philosophers(t_table *table, t_philosopher *philosophers) 
+{
+   int i = 0;
+    pthread_mutex_destroy(&table->print_lock);
+    while ( i < table->philo_nbr)
+     {
+        pthread_mutex_destroy(&table->forks[i]);
+        i++;
+    }
+    free(table->forks);
+    free(philosophers);
+}

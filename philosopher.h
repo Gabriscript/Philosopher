@@ -47,5 +47,12 @@ int *args_valid_check(int argc, char **argv);
 int	ft_atoi(char *str);
 void error_exit(const char *s);
 void *safe_malloc(size_t bytes);
+void initialize_input(t_table *t_table, int *args);
+size_t	get_current_time(void);
+int	ft_usleep(size_t milliseconds);
+void philosopher_routine(t_philosopher *philo);
+void ft_putstr_fd(char *s,int fd);
+void cleanup_philosophers(t_table *table, t_philosopher *philosophers);
+int create_philosopher_threads(t_table *table, t_philosopher *philosophers);
 
 #endif

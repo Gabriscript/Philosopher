@@ -76,33 +76,45 @@ void *safe_malloc(size_t bytes)
     return (ret);
 }
 
-size_t	get_current_time(void)
+size_t get_current_time(void)
 {
-	struct timeval	time;
+    struct timeval time;
 
-	if (gettimeofday(&time, NULL) == -1)
-		ft_putstr_fd( "gettimeofday() error\n", 2);
-	return (time.tv_sec * 1000 + time.tv_usec / 1000);
+    if (gettimeofday(&time, NULL) == -1)
+    {
+        ft_putstr_fd("gettimeofday() error\n", 2);
+        return 0;  // Evita di restituire un valore non valido
+    }
+    return (time.tv_sec * 1000 + time.tv_usec / 1000);
 }
 
-int	ft_usleep(size_t milliseconds)
-{
-	size_t	start;
 
-	start = get_current_time();
-	while ((get_current_time() - start) < milliseconds)
-		usleep(500);
-	return (0);
+
+int ft_usleep(size_t milliseconds)
+{
+    size_t start = get_current_time();
+
+    while ((get_current_time() - start) < milliseconds)
+    {
+        if (milliseconds - (get_current_time() - start) > 10)
+            usleep(1000);  // Dorme per almeno 1ms se il tempo rimanente è lungo
+        else
+            usleep(100);  // Per gli ultimi millisecondi, usa un delay più piccolo
+    }
+    return (0);
 }
+
 
 
 
 void cleanup_philosophers(t_table *table, t_philosopher *philosophers) 
 {
-   int i = 0;
+    int i = 0;
     pthread_mutex_destroy(&table->print_lock);
-    while ( i < table->philo_nbr)
-     {
+    pthread_mutex_destroy(&table->meal_lock);  // Destroy meal_lock
+    
+    while (i < table->philo_nbr)
+    {
         pthread_mutex_destroy(&table->forks[i]);
         i++;
     }

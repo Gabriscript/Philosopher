@@ -21,18 +21,24 @@ int main(int argc, char **argv)
     args = args_valid_check(argc, argv);
     if(!args)
         error_exit("Incorrect input");
-    initialize_input(&table, args);
+    initialize_input(&table, args, argc);  // Pass argc to initialize_input
     free(args);
     table.someone_died = 0;
     philosophers = safe_malloc(sizeof(t_philosopher) * table.philo_nbr);
+    table.philosophers = philosophers;
     table.forks = safe_malloc(sizeof(pthread_mutex_t) * table.philo_nbr);
   
     pthread_mutex_init(&table.print_lock, NULL);
-    if (create_philosopher_threads(&table, philosophers) != 0) {
+    pthread_mutex_init(&table.meal_lock, NULL);  // Initialize meal_lock
+    
+    if (create_philosopher_threads(&table, philosophers) != 0) 
         error_exit("Failed to create philosopher threads");
-    }
-    //TODO  implementare MONITOR
+    
+    pthread_t monitor_thread;
+    if (pthread_create(&monitor_thread, NULL, monitor, &table) != 0) 
+        error_exit("Failed to create death monitor thread");
+    
+    pthread_join(monitor_thread, NULL);
     cleanup_philosophers(&table, philosophers);
-    return 0;
-
+    return (0);
 }

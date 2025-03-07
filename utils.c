@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #include"philosopher.h"
 
 static int ft_strlen(char *s)
@@ -57,7 +58,7 @@ int	ft_atoi(char *str)
 	return (res);
 }
 
-void error_exit(const char *s)
+void error_exit(char *s)
 {
     if (!s)
         return ;

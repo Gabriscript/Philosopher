@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #include"philosopher.h"
 void print_status(t_philosopher *philo, char *status)
 {
@@ -21,6 +22,7 @@ void print_status(t_philosopher *philo, char *status)
 
 void philo_think(t_philosopher *philo)
 {
+   
     print_status(philo, "is thinking");
 }
 
@@ -35,20 +37,22 @@ void philo_eat(t_philosopher *philo) {
     int second_fork;
 
     // Order forks based on philosopher ID
-    if (philo->id % 2 == 0)
-    {
-        first_fork = philo->id - 1;
-        second_fork = (philo->id) % philo->table->philo_nbr;
-    } 
-    else 
-    {
-        first_fork = (philo->id - 1 + philo->table->philo_nbr - 1) % philo->table->philo_nbr;
-        second_fork = philo->id - 1;
+    if (philo->id % 2 == 0) {
+        first_fork = philo->id - 1; // Sinistra
+        second_fork = (philo->id) % philo->table->philo_nbr; // Destra
+    } else {
+        first_fork = (philo->id) % philo->table->philo_nbr; // Destra
+        second_fork = philo->id - 1; // Sinistra
+     
+        
     }
 
-    // Acquire forks
+  
+
     pthread_mutex_lock(&philo->table->forks[first_fork]);
     print_status(philo, "has taken a fork");
+
+    
     pthread_mutex_lock(&philo->table->forks[second_fork]);
     print_status(philo, "has taken a fork");
 
@@ -58,15 +62,15 @@ void philo_eat(t_philosopher *philo) {
         pthread_mutex_unlock(&philo->table->forks[second_fork]);
         return;
     }
-
-    // Eat
-    print_status(philo, "is eating");
     
     // Protect last_meal_time with mutex
     pthread_mutex_lock(&philo->table->meal_lock);
     philo->last_meal_time = get_current_time();
     philo->meals_eaten++;
     pthread_mutex_unlock(&philo->table->meal_lock);
+    
+        // Eat
+    print_status(philo, "is eating");
     
     ft_usleep(philo->table->time_to_eat);
 
@@ -75,10 +79,12 @@ void philo_eat(t_philosopher *philo) {
     pthread_mutex_unlock(&philo->table->forks[second_fork]);
 }
 
-void philosopher_routine(t_philosopher *philo)
+void *philosopher_routine(void *arg)
 {
-    if (philo->id % 2 == 0)
-        ft_usleep(1000);
+    t_philosopher *philo = (t_philosopher *)arg;
+    
+   if (philo->id % 2 == 0)
+ft_usleep(philo->table->time_to_eat);
 
     while (!philo->table->someone_died)
     {
@@ -91,4 +97,6 @@ void philosopher_routine(t_philosopher *philo)
             break;
         philo_think(philo);
     }
+    
+    return NULL;
 }

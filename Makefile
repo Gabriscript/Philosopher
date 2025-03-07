@@ -10,9 +10,10 @@
 #                                                                              #
 # **************************************************************************** #
 
+
 NAME = philo
 
-CC = gcc
+CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
 SRCS = main.c checks.c initialization.c routine.c utils.c 

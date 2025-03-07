@@ -25,9 +25,9 @@ struct s_philosopher;
 typedef struct s_table
 {
     int philo_nbr;
-    long time_to_die; 
-    long time_to_eat;
-    long time_to_sleep;
+    size_t time_to_die; 
+    size_t time_to_eat;
+    size_t time_to_sleep;
     int max_meals;
     pthread_mutex_t *forks;
     pthread_mutex_t print_lock;
@@ -48,12 +48,12 @@ typedef struct s_philosopher
 
 int *args_valid_check(int argc, char **argv);
 int	ft_atoi(char *str);
-void error_exit(const char *s);
+void error_exit(char *s);
 void *safe_malloc(size_t bytes);
 void initialize_input(t_table *table, int *args, int argc);
 size_t	get_current_time(void);
 int	ft_usleep(size_t milliseconds);
-void philosopher_routine(t_philosopher *philo);
+void *philosopher_routine(void *arg);
 void ft_putstr_fd(char *s, int fd);
 void cleanup_philosophers(t_table *table, t_philosopher *philosophers);
 int create_philosopher_threads(t_table *table, t_philosopher *philosophers);

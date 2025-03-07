@@ -10,6 +10,7 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+
 #include"philosopher.h"
 
 int *args_valid_check(int argc, char **argv)
@@ -20,8 +21,10 @@ int *args_valid_check(int argc, char **argv)
     if (argc != 5 && argc != 6)
         return (0);
     i = 1;
-    while(argv[i])
+    while (argv[i])
+    {
         i++;
+    }
         result = safe_malloc(sizeof(int) * (argc - 1));
         i = 0;
         while (i < argc - 1)

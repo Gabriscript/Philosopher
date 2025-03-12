@@ -10,93 +10,93 @@
 /*                                                                            */
 /* ************************************************************************** */
 
+#include "philosopher.h"
 
-#include"philosopher.h"
-void print_status(t_philosopher *philo, char *status)
+static void	philo_think(t_philosopher *philo)
 {
-    pthread_mutex_lock(&philo->table->print_lock);
-    if (!philo->table->someone_died)
-        printf("%zu %d %s\n", get_current_time() - philo->table->start_time, philo->id, status);
-    pthread_mutex_unlock(&philo->table->print_lock);
+	long	eat;
+	long	sleep;
+	long	think;
+
+	print_status(philo, "is thinking");
+	if (philo->table->philo_nbr % 2 == 0)
+		return ;
+	eat = philo->table->time_to_eat;
+	sleep = philo->table->time_to_sleep;
+	think = eat * 2 - sleep;
+	if (think < 0)
+		think = 0;
+	ft_usleep(think * 0.4);
 }
 
-void philo_think(t_philosopher *philo)
+static void	philo_sleep(t_philosopher *philo)
 {
-   
-    print_status(philo, "is thinking");
+	print_status(philo, "is sleeping");
+	ft_usleep(philo->table->time_to_sleep);
 }
 
-void philo_sleep(t_philosopher *philo)
+static void	fork_ordering(int *frst_fork, int *scnd_fork, t_philosopher *philo)
 {
-    print_status(philo, "is sleeping");
-    ft_usleep(philo->table->time_to_sleep);
+	if (philo->id % 2 == 0)
+	{
+		*frst_fork = philo->id - 1;
+		*scnd_fork = (philo->id) % philo->table->philo_nbr;
+	}
+	else
+	{
+		*frst_fork = (philo->id) % philo->table->philo_nbr;
+		*scnd_fork = philo->id - 1;
+	}
+	if (*frst_fork < 0)
+		*frst_fork = philo->table->philo_nbr - 1;
 }
 
-void philo_eat(t_philosopher *philo) {
-    int first_fork;
-    int second_fork;
+static void	philo_eat(t_philosopher *philo)
+{
+	int	first_fork;
+	int	second_fork;
 
-    // Order forks based on philosopher ID
-    if (philo->id % 2 == 0) {
-        first_fork = philo->id - 1; // Sinistra
-        second_fork = (philo->id) % philo->table->philo_nbr; // Destra
-    } else {
-        first_fork = (philo->id) % philo->table->philo_nbr; // Destra
-        second_fork = philo->id - 1; // Sinistra
-     
-        
-    }
-
-  
-
-    pthread_mutex_lock(&philo->table->forks[first_fork]);
-    print_status(philo, "has taken a fork");
-
-    
-    pthread_mutex_lock(&philo->table->forks[second_fork]);
-    print_status(philo, "has taken a fork");
-
-    // Check if simulation has ended
-    if (philo->table->someone_died) {
-        pthread_mutex_unlock(&philo->table->forks[first_fork]);
-        pthread_mutex_unlock(&philo->table->forks[second_fork]);
-        return;
-    }
-    
-    // Protect last_meal_time with mutex
-    pthread_mutex_lock(&philo->table->meal_lock);
-    philo->last_meal_time = get_current_time();
-    philo->meals_eaten++;
-    pthread_mutex_unlock(&philo->table->meal_lock);
-    
-        // Eat
-    print_status(philo, "is eating");
-    
-    ft_usleep(philo->table->time_to_eat);
-
-    // Release forks
-    pthread_mutex_unlock(&philo->table->forks[first_fork]);
-    pthread_mutex_unlock(&philo->table->forks[second_fork]);
+	fork_ordering(&first_fork, &second_fork, philo);
+	pthread_mutex_lock(&philo->table->forks[first_fork]);
+	print_status(philo, "has taken a fork");
+	pthread_mutex_lock(&philo->table->forks[second_fork]);
+	print_status(philo, "has taken a fork");
+	if (philo->table->someone_died)
+	{
+		pthread_mutex_unlock(&philo->table->forks[first_fork]);
+		pthread_mutex_unlock(&philo->table->forks[second_fork]);
+		return ;
+	}
+	pthread_mutex_lock(&philo->table->meal_lock);
+	philo->last_meal_time = get_current_time();
+	philo->meals_eaten++;
+	pthread_mutex_unlock(&philo->table->meal_lock);
+	print_status(philo, "is eating");
+	ft_usleep(philo->table->time_to_eat);
+	pthread_mutex_unlock(&philo->table->forks[first_fork]);
+	pthread_mutex_unlock(&philo->table->forks[second_fork]);
 }
 
-void *philosopher_routine(void *arg)
+void	*philosopher_routine(void *arg)
 {
-    t_philosopher *philo = (t_philosopher *)arg;
-    
-   if (philo->id % 2 == 0)
-ft_usleep(philo->table->time_to_eat);
+	t_philosopher	*philo;
 
-    while (!philo->table->someone_died)
-    {
-        philo_eat(philo);
-        if (philo->table->someone_died || (philo->table->max_meals != -1 && 
-            philo->meals_eaten >= philo->table->max_meals))
-            break;
-        philo_sleep(philo);
-        if (philo->table->someone_died)
-            break;
-        philo_think(philo);
-    }
-    
-    return NULL;
+	philo = (t_philosopher *)arg;
+	if (philo->table->philo_nbr % 2 == 0)
+	{
+		if (philo->id % 2 == 0)
+			ft_usleep(3);
+	}
+	else
+	{
+		if (philo->id % 2 == 0)
+			philo_think(philo);
+	}
+	while (!philo->table->someone_died)
+	{
+		philo_eat(philo);
+		philo_sleep(philo);
+		philo_think(philo);
+	}
+	return (NULL);
 }

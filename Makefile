@@ -10,13 +10,12 @@
 #                                                                              #
 # **************************************************************************** #
 
-
 NAME = philo
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRCS = main.c checks.c initialization.c routine.c utils.c 
+SRCS = main.c checks.c initialization.c routine.c utils.c utils_two.c
 OBJS = $(SRCS:.c=.o)
 
 all: $(NAME)

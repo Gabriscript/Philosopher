@@ -63,7 +63,7 @@ static void	philo_eat(t_philosopher *philo)
 	print_status(philo, "has taken a fork");
 	if (philo->table->someone_died)
 	{
-		pthread_mutex_unlock(&philo->table->forks[first_fork]);
+        pthread_mutex_unlock(&philo->table->forks[first_fork]);
 		pthread_mutex_unlock(&philo->table->forks[second_fork]);
 		return ;
 	}

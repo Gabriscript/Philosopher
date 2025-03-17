@@ -43,11 +43,11 @@ static int	check_philo_death(t_table *table, int i)
 	if (current_time >= table->philosophers[i].last_meal_time
 		+ table->time_to_die)
 	{
-		pthread_mutex_unlock(&table->meal_lock);
-		pthread_mutex_lock(&table->print_lock);
+        pthread_mutex_lock(&table->print_lock);
 		printf("%ld %d died\n", current_time - table->start_time, i + 1);
 		table->someone_died = 1;
 		pthread_mutex_unlock(&table->print_lock);
+		pthread_mutex_unlock(&table->meal_lock);
 		return (1);
 	}
 	pthread_mutex_unlock(&table->meal_lock);

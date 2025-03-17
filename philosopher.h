@@ -55,6 +55,7 @@ void	print_status(t_philosopher *philo, char *status);
 void	initialize_input(t_table *table, int *args, int argc);
 void	ft_putstr_fd(char *s, int fd);
 void	cleanup_philosophers(t_table *table, t_philosopher *philosophers);
+void	init_forks(t_table *table);
 void	*monitor(void *arg);
 void	*philosopher_routine(void *arg);
 void	*safe_malloc(size_t bytes);

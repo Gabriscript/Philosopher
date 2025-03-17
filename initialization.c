@@ -31,6 +31,7 @@ static void	init_philo(t_philosopher *philosopher, int id, t_table *table)
 	philosopher->meals_eaten = 0;
 	philosopher->last_meal_time = get_current_time();
 	philosopher->table = table;
+    
 }
 
 int	create_philosopher_threads(t_table *table, t_philosopher *philosophers)
@@ -40,14 +41,27 @@ int	create_philosopher_threads(t_table *table, t_philosopher *philosophers)
 	i = 0;
 	while (i < table->philo_nbr)
 	{
-		if (pthread_mutex_init(&table->forks[i], NULL) != 0)
-			return (ft_putstr_fd("pthread_mutex_init failed", 2), -1);
 		init_philo(&philosophers[i], i, table);
 		if (pthread_create(&philosophers[i].thread, NULL,
 				(void *(*)(void *))philosopher_routine, &philosophers[i]) != 0)
 			return (ft_putstr_fd("pthread_create failed", 2), -1);
-		pthread_detach(philosophers[i].thread);
 		i++;
 	}
 	return (0);
+}
+
+void	init_forks(t_table *table)
+{
+	int	i;
+
+	i = 0;
+	while (i < table->philo_nbr)
+	{
+		if (pthread_mutex_init(&table->forks[i], NULL) != 0)
+		{
+			ft_putstr_fd("Error: Failed to initialize mutex\n", 2);
+			exit(EXIT_FAILURE);
+		}
+		i++;
+	}
 }

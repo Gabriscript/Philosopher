@@ -59,5 +59,6 @@ void	init_forks(t_table *table);
 void	*monitor(void *arg);
 void	*philosopher_routine(void *arg);
 void	*safe_malloc(size_t bytes);
+void	philo_sleep(t_philosopher *philo);
 
 #endif

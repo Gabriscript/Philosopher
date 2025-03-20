@@ -65,3 +65,9 @@ void	error_exit(char *s)
 	write(2, "\n", 1);
 	exit(EXIT_FAILURE);
 }
+
+void	philo_sleep(t_philosopher *philo)
+{
+	print_status(philo, "is sleeping");
+	ft_usleep(philo->table->time_to_sleep);
+}

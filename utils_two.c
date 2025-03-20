@@ -56,7 +56,7 @@ void	cleanup_philosophers(t_table *table, t_philosopher *philosophers)
 	i = 0;
 	while (i < table->philo_nbr)
 	{
-        pthread_join(philosophers[i].thread, NULL);
+		pthread_join(philosophers[i].thread, NULL);
 		pthread_mutex_destroy(&table->forks[i]);
 		i++;
 	}

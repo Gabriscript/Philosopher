@@ -42,7 +42,7 @@ int	create_philosopher_threads(t_table *table, t_philosopher *philosophers)
 	{
 		init_philo(&philosophers[i], i, table);
 		if (pthread_create(&philosophers[i].thread, NULL,
-				(void *(*)(void *))philosopher_routine, &philosophers[i]) != 0)
+				philosopher_routine, &philosophers[i]) != 0)
 			return (ft_putstr_fd("pthread_create failed", 2), -1);
 		i++;
 	}

@@ -43,9 +43,17 @@ static int	check_philo_death(t_table *table, int i)
 	if (current_time >= table->philosophers[i].last_meal_time
 		+ table->time_to_die)
 	{
+		pthread_mutex_lock(&table->death_lock);
+		if (table->someone_died)
+		{
+			pthread_mutex_unlock(&table->death_lock);
+			pthread_mutex_unlock(&table->meal_lock);
+			return (0);
+		}
 		pthread_mutex_lock(&table->print_lock);
 		printf("%ld %d died\n", current_time - table->start_time, i + 1);
 		table->someone_died = 1;
+		pthread_mutex_unlock(&table->death_lock);
 		pthread_mutex_unlock(&table->print_lock);
 		pthread_mutex_unlock(&table->meal_lock);
 		return (1);
@@ -73,8 +81,10 @@ static int	check_all_ate_enough(t_table *table)
 		i++;
 	}
 	pthread_mutex_lock(&table->print_lock);
+	pthread_mutex_lock(&table->death_lock);
 	printf("All philosophers have eaten enough.\n");
 	table->someone_died = 1;
+	pthread_mutex_unlock(&table->death_lock);
 	pthread_mutex_unlock(&table->print_lock);
 	return (1);
 }
@@ -85,11 +95,18 @@ void	*monitor(void *arg)
 	int		i;
 
 	table = (t_table *)arg;
-	while (!table->someone_died)
+	while (1)
 	{
 		i = 0;
 		while (i < table->philo_nbr)
 		{
+			pthread_mutex_lock(&table->death_lock);
+			if (table->someone_died)
+			{
+				pthread_mutex_unlock(&table->death_lock);
+				break ;
+			}
+			pthread_mutex_unlock(&table->death_lock);
 			if (check_philo_death(table, i))
 				return (NULL);
 			i++;

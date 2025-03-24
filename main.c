@@ -30,6 +30,7 @@ int	main(int argc, char **argv)
 	table.forks = safe_malloc(sizeof(pthread_mutex_t) * table.philo_nbr);
 	pthread_mutex_init(&table.print_lock, NULL);
 	pthread_mutex_init(&table.meal_lock, NULL);
+	pthread_mutex_init(&table.death_lock, NULL);
 	init_forks(&table);
 	if (create_philosopher_threads(&table, philosophers) != 0)
 		error_exit("Failed to create philosopher threads");

@@ -62,6 +62,7 @@ void	cleanup_philosophers(t_table *table, t_philosopher *philosophers)
 	}
 	pthread_mutex_destroy(&table->print_lock);
 	pthread_mutex_destroy(&table->meal_lock);
+	pthread_mutex_destroy(&table->death_lock);
 	free(table->forks);
 	free(philosophers);
 }

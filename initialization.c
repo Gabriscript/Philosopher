@@ -64,3 +64,19 @@ void	init_forks(t_table *table)
 		i++;
 	}
 }
+
+void	fork_ordering(int *frst_fork, int *scnd_fork, t_philosopher *philo)
+{
+	if (philo->id % 2 == 0)
+	{
+		*frst_fork = philo->id - 1;
+		*scnd_fork = (philo->id) % philo->table->philo_nbr;
+	}
+	else
+	{
+		*frst_fork = (philo->id) % philo->table->philo_nbr;
+		*scnd_fork = philo->id - 1;
+	}
+	if (*frst_fork < 0)
+		*frst_fork = philo->table->philo_nbr - 1;
+}

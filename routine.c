@@ -29,22 +29,6 @@ static void	philo_think(t_philosopher *philo)
 	ft_usleep(think * 0.4);
 }
 
-static void	fork_ordering(int *frst_fork, int *scnd_fork, t_philosopher *philo)
-{
-	if (philo->id % 2 == 0)
-	{
-		*frst_fork = philo->id - 1;
-		*scnd_fork = (philo->id) % philo->table->philo_nbr;
-	}
-	else
-	{
-		*frst_fork = (philo->id) % philo->table->philo_nbr;
-		*scnd_fork = philo->id - 1;
-	}
-	if (*frst_fork < 0)
-		*frst_fork = philo->table->philo_nbr - 1;
-}
-
 static int	handle_forks(t_philosopher *philo, int first_fork, int second_fork)
 {
 	pthread_mutex_lock(&philo->table->forks[first_fork]);
@@ -57,12 +41,15 @@ static int	handle_forks(t_philosopher *philo, int first_fork, int second_fork)
 	}
 	pthread_mutex_lock(&philo->table->forks[second_fork]);
 	print_status(philo, "has taken a fork");
+	pthread_mutex_lock(&philo->table->death_lock);
 	if (philo->table->someone_died)
 	{
+		pthread_mutex_unlock(&philo->table->death_lock);
 		pthread_mutex_unlock(&philo->table->forks[first_fork]);
 		pthread_mutex_unlock(&philo->table->forks[second_fork]);
 		return (0);
 	}
+	pthread_mutex_unlock(&philo->table->death_lock);
 	return (1);
 }
 
@@ -84,7 +71,7 @@ static void	philo_eat(t_philosopher *philo)
 	pthread_mutex_unlock(&philo->table->forks[second_fork]);
 }
 
-void	*philosopher_routine(void *arg)
+static void	fairness_sorting(void *arg)
 {
 	t_philosopher	*philo;
 
@@ -99,8 +86,23 @@ void	*philosopher_routine(void *arg)
 		if (philo->id % 2 == 0)
 			philo_think(philo);
 	}
-	while (!philo->table->someone_died)
+}
+
+void	*philosopher_routine(void *arg)
+{
+	t_philosopher	*philo;
+
+	philo = (t_philosopher *)arg;
+	fairness_sorting(philo);
+	while (1)
 	{
+		pthread_mutex_lock(&philo->table->death_lock);
+		if (philo->table->someone_died)
+		{
+			pthread_mutex_unlock(&philo->table->death_lock);
+			break ;
+		}
+		pthread_mutex_unlock(&philo->table->death_lock);
 		philo_eat(philo);
 		philo_sleep(philo);
 		philo_think(philo);

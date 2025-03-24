@@ -33,6 +33,7 @@ typedef struct s_table
 	pthread_mutex_t			*forks;
 	pthread_mutex_t			print_lock;
 	pthread_mutex_t			meal_lock;
+	pthread_mutex_t			death_lock;
 	struct s_philosopher	*philosophers;
 }	t_table;
 
@@ -55,6 +56,7 @@ void	print_status(t_philosopher *philo, char *status);
 void	initialize_input(t_table *table, int *args, int argc);
 void	ft_putstr_fd(char *s, int fd);
 void	cleanup_philosophers(t_table *table, t_philosopher *philosophers);
+void	fork_ordering(int *frst_fork, int *scnd_fork, t_philosopher *philo);
 void	init_forks(t_table *table);
 void	*monitor(void *arg);
 void	*philosopher_routine(void *arg);

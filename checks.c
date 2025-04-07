@@ -22,12 +22,14 @@ int	*args_valid_check(int argc, char **argv)
 	i = 1;
 	while (argv[i])
 		i++;
-	result = safe_malloc(sizeof(int) * (argc - 1));
+	result = malloc(sizeof(int) * (argc - 1));
+	if(!result)
+		return (0);
 	i = 0;
 	while (i < argc - 1)
 	{
 		result[i] = ft_atoi(argv[i + 1]);
-		if (result[i] == 0)
+		if (result[i] == 0 || result[0] > PHILO_MAX)
 			return (free(result), NULL);
 		i++;
 	}

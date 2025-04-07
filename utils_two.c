@@ -12,16 +12,6 @@
 
 #include "philosopher.h"
 
-void	*safe_malloc(size_t bytes)
-{
-	void	*ret;
-
-	ret = malloc(bytes);
-	if (ret == NULL)
-		error_exit("Malloc error");
-	return (ret);
-}
-
 size_t	get_current_time(void)
 {
 	struct timeval	time;
@@ -49,17 +39,16 @@ int	ft_usleep(size_t milliseconds)
 	return (0);
 }
 
-void	cleanup_philosophers(t_table *table, t_philosopher *philosophers)
+void	cleanup(t_table *table, t_philosopher *philosophers)
 {
 	int	i;
 
 	i = 0;
+	pthread_join(table->monitor_thread, NULL);
 	while (i < table->philo_nbr)
-	{
-		pthread_join(philosophers[i].thread, NULL);
-		pthread_mutex_destroy(&table->forks[i]);
-		i++;
-	}
+		pthread_join(philosophers[i++].thread, NULL);
+	while (i < table->philo_nbr)
+		pthread_mutex_destroy(&table->forks[i++]);
 	pthread_mutex_destroy(&table->print_lock);
 	pthread_mutex_destroy(&table->meal_lock);
 	pthread_mutex_destroy(&table->death_lock);

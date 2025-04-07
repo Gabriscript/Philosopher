@@ -71,11 +71,9 @@ static void	philo_eat(t_philosopher *philo)
 	pthread_mutex_unlock(&philo->table->forks[second_fork]);
 }
 
-static void	fairness_sorting(void *arg)
+static void fairness_sorting(t_philosopher *philo)
 {
-	t_philosopher	*philo;
-
-	philo = (t_philosopher *)arg;
+	print_status(philo, "is thinking");
 	if (philo->table->philo_nbr % 2 == 0)
 	{
 		if (philo->id % 2 == 0)
@@ -84,7 +82,9 @@ static void	fairness_sorting(void *arg)
 	else
 	{
 		if (philo->id % 2 == 0)
-			philo_think(philo);
+			ft_usleep(3);
+		else if (philo->id == philo->table->philo_nbr)
+			ft_usleep(1);
 	}
 }
 

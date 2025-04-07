@@ -44,30 +44,28 @@ int	ft_atoi(char *str)
 			return (0);
 		i++;
 	}
-	if (ft_strlen(str) > 10)
+	if (ft_strlen(str) > 5)
 		return (0);
 	i = 0;
 	while (str[i] >= '0' && str[i] <= '9')
 	{
 		res = (res * 10) + (str[i] - '0');
 		i++;
-		if (res > INT_MAX)
-			return (0);
 	}
 	return (res);
-}
-
-void	error_exit(char *s)
-{
-	if (!s)
-		return ;
-	ft_putstr_fd(s, 2);
-	write(2, "\n", 1);
-	exit(EXIT_FAILURE);
 }
 
 void	philo_sleep(t_philosopher *philo)
 {
 	print_status(philo, "is sleeping");
 	ft_usleep(philo->table->time_to_sleep);
+}
+
+int	free_all_and_return(t_table *table, int code)
+{
+	if (table->philosophers)
+		free(table->philosophers);
+	if (table->forks)
+		free(table->forks);
+	return (code);
 }
